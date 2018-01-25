@@ -1,0 +1,218 @@
+﻿@model BookStock.Models.IssueBookModel
+
+@{
+    ViewBag.Title = "IssueBook";
+}
+
+<h2>IssueBook</h2>
+
+
+@*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+
+
+<div class="form-group form-inline pnl ">
+
+    <div class="form-group">
+        <div class="control-label"> Select Book :</div>
+        <div class="">
+            @Html.DropDownListFor(p => p.Books, new SelectList((Model.Books.Select(p => new SelectListItem { Text = p.Value, Value = p.Key.ToString() })), "Value", "Text", "Select"), new { @class = "chosen" })
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <div class=""> Select Student :</div>
+        <div class="">
+            <div> @Html.TextBoxFor(p => p.StudentName, new { id = "StudentName" })</div>
+        </div>
+
+    </div>
+
+    <div>
+
+
+        <input type="button" name="btnAdd" id="btnAdd" value="Add" class="btn btn-default pull-left form-control " />
+
+
+
+
+    </div>
+
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <table class="table table-bordered table-hover" id="tab_logic">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                #
+                            </th>
+                            <th class="text-center">
+                                Book Name
+                            </th>
+                            <th class=" text-center">
+                                Delete
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id='addr0'>
+                            <td>
+                                1
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr id='addr1'></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <input type="submit" name="btnSave" value="Issue Book" class="btn btn-default pull-left" />
+        @*<a id="add_row" class="btn btn-default pull-left">Add Row</a><a id='delete_row' class="pull-right btn btn-default">Delete Row</a>*@
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+      
+           
+
+
+
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+<link href="~/Content/custom/chosen.min.css" rel="stylesheet" />
+
+<link href="~/Content/Site.css" rel="stylesheet" />
+<link href="~/Content/custom/form.css" rel="stylesheet" />
+
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+
+<script src="~/Scripts/bootstrap.js"></script>
+
+
+<script src="~/Scripts/appScript/_chosen.jquery.js"></script>
+
+<script src="~/Scripts/jquery-ui.js"></script>
+
+
+
+
+<script type="text/javascript">
+
+    
+    $(document).ready(function () {
+        $(".chosen").chosen({});
+
+        $("#StudentName").autocomplete({
+            minLength: 2,
+            source: '@Url.Action("GetStudent")' //function (request, response) {
+        });
+    });
+                //$.ajax({
+                //    url: "/BookStock/GetStudent",
+                //    type: "POST",
+                //    data: "{ studentId:'" + request.term + "'}",
+                //    dataType: "json",
+                //    contentType:"application/json; charset=utf-8",
+                //    success: function (data) {
+
+                //        response($.map(data, function (item) {
+                //            return {
+                //                label: item
+                //            }
+                //        }))
+
+                //    },
+                //    error: function (response) {
+                //        alert("Error"+response.responseText);
+                //    },
+                //    failure: function (response) {
+                //        alert("Fail"+response.responseText);
+                //    }
+                //})
+            //}
+        //});
+
+
+
+    
+    $(document).ready(function () {
+
+        $(document).on("click", "span", function () {
+            $(this).parent().parent().remove();
+        });
+        var i = 1;
+
+        $("#btnAdd").click(function () {
+            debugger;
+            var bookid = $("#Books option:selected").val();
+            var studentId = $("#StudentName").val();
+            CheckBookAlreadyIssue(studentId, bookid);
+            if (i == 1) {
+
+            }
+            var unique = true;
+            $("input[type='hidden']").each(function () {
+
+                if ($(this).val() == $("#Books option:selected").val()) {
+                    unique = false;
+                    return;
+                }
+            });
+            if (unique == true) {
+                $('#addr' + i).html("<td>  <input type='hidden' id='BookId'" + i + " name='BooksId' value=" + $("#Books option:selected").val() + "> " + (i + 1) + "</td><td>" + $("#Books option:selected").text() + "</td> <td><span><img src='/Images/deleteIcon.jpg' width='25px'/></span>");
+
+                $('#tab_logic').append('<tr id="addr' + (i + 1) + '"></tr>');
+                i++;
+            }
+        });
+        $("span").click(function () {
+
+            if (i > 1) {
+                // $("#addr"+(i-1)).html('');
+                // $(this).find("tr").html('');
+                i--;
+            }
+        });
+
+
+        function CheckBookAlreadyIssue(studentId, bookId) {
+            alert(studentId + '-' + bookId);
+           // var data = JSON.stringify("{studentId:" + studentId + " , bookId:" + bookId + "}");
+            $.ajax({
+                url: "/BookStock/IsAlreadyAssignBook",
+                type: "POST",
+                data: "{studentId:'" + studentId + "' , bookId:'" + bookId + "'}",
+                dataType: "json",
+                contentType: "application/json",
+                success: function (data) {
+                    if (data == false) {
+
+                    }
+                    else {
+                        $("#").html('');
+                    //    $("#").html('<div class="alert alert-info fade in alert-dismissable">
+                    //    '<a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">×</a>
+                    //    '<strong>Warning! Already Assign book</strong> 
+                    //'</div>"');
+                    }
+                },
+
+                error: function (e) { alert(e.responseText); }
+
+            });
+        }
+
+    });
+    </script>
