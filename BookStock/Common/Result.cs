@@ -7,6 +7,7 @@ namespace BookStock.Common
 {
     public class Result
     {
+
         public string Message { get; set; }
         public Status Status { get; set; }
         public object Data { get; set; }
